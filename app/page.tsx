@@ -1,9 +1,26 @@
 "use client";
 
+import { CATEGORIES, CATEGORY_COLORS } from "@/lib/types";
+import { useParts } from "@/lib/useParts";
 import { useState } from "react";
 
+const ALL = "All";
+
 export default function Home() {
-  const [error, setError] = useState();
+  const { parts, loaded, error } = useParts();
+  const [search, setSearch] = useState("");
+  const [catFilter, setCatFilter] = useState(ALL);
+
+  const filtered = parts.filter((part) => {
+    const query = search.toLowerCase();
+    const matchSearch =
+      !query ||
+      part.name.toLowerCase().includes(query) ||
+      part.id.toLowerCase().includes(query) ||
+      part.category.toLowerCase().includes(query);
+    return matchSearch && (catFilter === ALL || part.category === catFilter);
+  });
+
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
       {/* Header */}
@@ -48,11 +65,41 @@ export default function Home() {
           <input
             type="text"
             placeholder="Search parts…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="grow"
             aria-label="Search parts"
           />
         </label>
         <button className="btn btn-primary">+ Add part</button>
+      </div>
+
+      {/* Category filter chips */}
+      <div className="flex flex-wrap gap-1.5 mb-4" role="group" aria-label="Filter by category">
+        {[ALL, ...CATEGORIES].map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setCatFilter(cat)}
+            className={`badge badge-xl gap-1.5 cursor-pointer border transition-colors ${
+              catFilter === cat
+                ? "badge-primary border-primary"
+                : "badge-ghost border-base-300 hover: border-base-content/30"
+            }`}
+          >
+            {cat !== ALL && (
+              <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{ background: CATEGORY_COLORS[cat as keyof typeof CATEGORY_COLORS] }}
+              />
+            )}
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Parts List */}
+      <div className="flex flex-col gap-2" aria-label="Parts list">
+        {!loaded ? <></> : filtered.map((part) => <div>{part.name}</div>)}
       </div>
     </main>
   );
