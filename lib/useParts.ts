@@ -92,5 +92,38 @@ export function useParts() {
     }
   }
 
-  return { parts, loaded, error, addPart, updatePart, refetch: fetchParts };
+  async function deletePart(_id: string) {
+    try {
+      const response = await fetch(`/api/parts/${_id}`, { method: "DELETE" });
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      setParts((prev) => prev.filter((part) => part._id !== _id));
+    } catch (err) {
+      console.error("deletePart-err:", err);
+      setError(err instanceof Error ? err.message : "Failed to delete part");
+    }
+  }
+
+  async function adjustQty(_id: string, delta: number) {
+    const part = parts.find((p) => p._id === _id);
+    if (!part) return;
+    const qty = Math.max(0, part.qty + delta);
+    try {
+      const res = await fetch(`/api/parts/${_id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ qty })
+      });
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+      const raw: RawPart = await res.json();
+      setParts((prev) => prev.map((p) => (p._id === _id ? toFrontend(raw) : p)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to adjust quantity");
+    }
+  }
+
+  return { parts, loaded, error, addPart, updatePart, deletePart, adjustQty, refetch: fetchParts };
 }

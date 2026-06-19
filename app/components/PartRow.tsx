@@ -35,7 +35,7 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             className="bin btn-sm byn-ghost btn-square"
-            onClick={() => {}}
+            onClick={() => onAdjust(part._id, -1)}
             aria-label="Decrease quantity"
           >
             -

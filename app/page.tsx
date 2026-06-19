@@ -10,7 +10,7 @@ const ALL = "All";
 type PartWithId = Part & { _id: string };
 
 export default function Home() {
-  const { parts, loaded, error, addPart, updatePart } = useParts();
+  const { parts, loaded, error, addPart, updatePart, deletePart, adjustQty } = useParts();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState(ALL);
   const [modal, setModal] = useState<{ mode: "add" | "edit"; part: PartWithId } | null>(null);
@@ -139,8 +139,8 @@ export default function Home() {
               onEdit={() => {
                 setModal({ mode: "edit", part: { ...part } });
               }}
-              onDelete={() => {}}
-              onAdjust={() => {}}
+              onDelete={() => deletePart(part._id)}
+              onAdjust={(_, delta) => adjustQty(part._id, delta)}
             />
           ))
         )}
