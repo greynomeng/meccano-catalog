@@ -3,6 +3,7 @@
 import { CATEGORIES, CATEGORY_COLORS } from "@/lib/types";
 import { useParts } from "@/lib/useParts";
 import { useState } from "react";
+import PartRow from "./components/PartRow";
 
 const ALL = "All";
 
@@ -99,7 +100,19 @@ export default function Home() {
 
       {/* Parts List */}
       <div className="flex flex-col gap-2" aria-label="Parts list">
-        {!loaded ? <></> : filtered.map((part) => <div>{part.name}</div>)}
+        {!loaded ? (
+          <></>
+        ) : (
+          filtered.map((part) => (
+            <PartRow
+              key={part._id}
+              part={part}
+              onEdit={() => {}}
+              onDelete={() => {}}
+              onAdjust={() => {}}
+            />
+          ))
+        )}
       </div>
     </main>
   );
