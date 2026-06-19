@@ -5,46 +5,52 @@ import { useParts } from "@/lib/useParts";
 import { useState } from "react";
 import PartRow from "./components/PartRow";
 import PartModal from "./components/PartModal";
+import ConfirmDelete from "./components/ConfirmDelete";
 
 const ALL = "All";
-type PartWithId = Part & { _id: string };
 
 export default function Home() {
   const { parts, loaded, error, addPart, updatePart, deletePart, adjustQty } = useParts();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState(ALL);
-  const [modal, setModal] = useState<{ mode: "add" | "edit"; part: PartWithId } | null>(null);
+  const [modal, setModal] = useState<{ mode: "add" | "edit"; part: Part } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Part | null>(null);
 
-  function blankPart(): PartWithId {
-    return {
-      _id: "",
-      id: "",
-      name: "",
-      category: "Structural",
-      qty: 1,
-      unit: "pcs",
-      note: ""
-    };
-  }
+  const blankPart = (): Part => ({
+    partId: "",
+    name: "",
+    category: "Structural",
+    qty: 1,
+    unit: "pcs",
+    note: ""
+  });
 
   const filtered = parts.filter((part) => {
     const query = search.toLowerCase();
     const matchSearch =
       !query ||
       part.name.toLowerCase().includes(query) ||
-      part.id.toLowerCase().includes(query) ||
+      part.partId.toLowerCase().includes(query) ||
       part.category.toLowerCase().includes(query);
     return matchSearch && (catFilter === ALL || part.category === catFilter);
   });
 
-  async function handleSave(part: PartWithId) {
+  async function handleSave(p: Part) {
     if (modal?.mode === "add") {
-      await addPart(part);
+      await addPart(p);
     } else {
-      await updatePart(part);
+      await updatePart(p);
     }
     setModal(null);
   }
+
+  async function handleConfirmDelete() {
+    if (!confirmDelete) return;
+    await deletePart(confirmDelete.partId);
+    setConfirmDelete(null);
+  }
+
+  const totalQty = parts.reduce((a, p) => a + p.qty, 0);
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
@@ -63,11 +69,11 @@ export default function Home() {
         </div>
         <div className="flex gap-2">
           <div className="stat bg-base-100 rounded-box py-2 px-4 shadow-sm">
-            <div className="stat-value text-lg">354</div>
+            <div className="stat-value text-lg">{parts.length}</div>
             <div className="stat-desc">Types</div>
           </div>
           <div className="stat bg-base-100 rounded-box py-2 px-4 shadow-sm">
-            <div className="stat-value text-lg">78</div>
+            <div className="stat-value text-lg">{totalQty.toLocaleString()}</div>
             <div className="stat-desc">Total</div>
           </div>
         </div>
@@ -130,17 +136,22 @@ export default function Home() {
       {/* Parts List */}
       <div className="flex flex-col gap-2" aria-label="Parts list">
         {!loaded ? (
-          <></>
+          <div className="flex justify-center py-12">
+            <span className="loading loading-spinner loading-md text-primary" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12 text-base-content/40">
+            <p className="text-2xl mb-2">⊘</p>
+            <p className="text-sm">No parts found</p>
+          </div>
         ) : (
-          filtered.map((part) => (
+          filtered.map((p) => (
             <PartRow
-              key={part._id}
-              part={part}
-              onEdit={() => {
-                setModal({ mode: "edit", part: { ...part } });
-              }}
-              onDelete={() => deletePart(part._id)}
-              onAdjust={(_, delta) => adjustQty(part._id, delta)}
+              key={p.partId}
+              part={p}
+              onEdit={() => setModal({ mode: "edit", part: { ...p } })}
+              onDelete={() => setConfirmDelete(p)}
+              onAdjust={adjustQty}
             />
           ))
         )}
@@ -151,8 +162,16 @@ export default function Home() {
         <PartModal
           initial={modal.part}
           mode={modal.mode}
-          onSave={(part) => handleSave(part as PartWithId)}
+          onSave={handleSave}
           onClose={() => setModal(null)}
+        />
+      )}
+
+      {confirmDelete && (
+        <ConfirmDelete
+          partName={`${confirmDelete.partId} – ${confirmDelete.name}`}
+          onConfirm={handleConfirmDelete}
+          onClose={() => setConfirmDelete(null)}
         />
       )}
     </main>

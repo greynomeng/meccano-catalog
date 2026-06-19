@@ -3,49 +3,39 @@
 import { useCallback, useEffect, useState } from "react";
 import { Part } from "./types";
 
-// Shape returned by Mongoose (uses _id, partId instead of id)
-interface RawPart {
-  _id: string;
-  partId: string;
-  name: string;
-  category: Part["category"];
-  qty: number;
-  unit: string;
-  note: string;
-}
-
-function toFrontend(raw: RawPart): Part & { _id: string } {
+// Strip Mongo internals (_id, __v, etc.) before storing in state
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function toPart(raw: any): Part {
   return {
-    _id: raw._id,
-    id: raw.partId,
+    partId: raw.partId,
     name: raw.name,
     category: raw.category,
     qty: raw.qty,
     unit: raw.unit,
-    note: raw.note
+    note: raw.note ?? ""
   };
 }
 
 export function useParts() {
-  const [parts, setParts] = useState<(Part & { _id: string })[]>([]);
+  const [parts, setParts] = useState<Part[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchParts = useCallback(async (category?: string, query?: string) => {
+  const fetchParts = useCallback(async (category?: string, q?: string) => {
     try {
       const params = new URLSearchParams();
       if (category && category !== "All") {
         params.set("category", category);
       }
-      if (query) {
-        params.set("q", query);
+      if (q) {
+        params.set("q", q);
       }
-      const responseponse = await fetch(`/api/parts/${params}`);
-      if (!responseponse.ok) {
-        throw new Error(await responseponse.text());
+      const res = await fetch(`/api/parts/${params}`);
+      if (!res.ok) {
+        throw new Error(await res.text());
       }
-      const data: RawPart[] = await responseponse.json();
-      setParts(data.map(toFrontend));
+      const data = await res.json();
+      setParts(data.map(toPart));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load parts");
     } finally {
@@ -60,57 +50,57 @@ export function useParts() {
 
   async function addPart(part: Part) {
     try {
-      const responseponse = await fetch("/api/parts", {
+      const res = await fetch("/api/parts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(part)
       });
-      if (!responseponse.ok) {
-        throw new Error(await responseponse.text());
+      if (!res.ok) {
+        throw new Error(await res.text());
       }
-      const raw: RawPart = await responseponse.json();
-      setParts((prev) => [toFrontend(raw), ...prev]);
+      const created = toPart(await res.json());
+      setParts((prev) => [created, ...prev]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add part");
     }
   }
 
-  async function updatePart(part: Part & { _id: string }) {
+  async function updatePart(part: Part) {
     try {
-      const response = await fetch(`/api/parts/${part._id}`, {
+      const res = await fetch(`/api/parts/${part.partId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(part)
       });
-      if (!response.ok) {
-        throw new Error(await response.text());
+      if (!res.ok) {
+        throw new Error(await res.text());
       }
-      const raw: RawPart = await response.json();
-      setParts((prev) => prev.map((p) => (p._id === part._id ? toFrontend(raw) : p)));
+      const updated = toPart(await res.json());
+      setParts((prev) => prev.map((p) => (p.partId === updated.partId ? updated : p)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update part");
     }
   }
 
-  async function deletePart(_id: string) {
+  async function deletePart(partId: string) {
     try {
-      const response = await fetch(`/api/parts/${_id}`, { method: "DELETE" });
-      if (!response.ok) {
-        throw new Error(await response.text());
+      const res = await fetch(`/api/parts/${partId}`, { method: "DELETE" });
+      if (!res.ok) {
+        throw new Error(await res.text());
       }
-      setParts((prev) => prev.filter((part) => part._id !== _id));
+      setParts((prev) => prev.filter((p) => p.partId !== partId));
     } catch (err) {
       console.error("deletePart-err:", err);
       setError(err instanceof Error ? err.message : "Failed to delete part");
     }
   }
 
-  async function adjustQty(_id: string, delta: number) {
-    const part = parts.find((p) => p._id === _id);
+  async function adjustQty(partId: string, delta: number) {
+    const part = parts.find((p) => p.partId === partId);
     if (!part) return;
     const qty = Math.max(0, part.qty + delta);
     try {
-      const res = await fetch(`/api/parts/${_id}`, {
+      const res = await fetch(`/api/parts/${partId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ qty })
@@ -118,8 +108,8 @@ export function useParts() {
       if (!res.ok) {
         throw new Error(await res.text());
       }
-      const raw: RawPart = await res.json();
-      setParts((prev) => prev.map((p) => (p._id === _id ? toFrontend(raw) : p)));
+      const updated: Part = await res.json();
+      setParts((prev) => prev.map((p) => (p.partId === partId ? updated : p)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to adjust quantity");
     }

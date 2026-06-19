@@ -3,7 +3,7 @@
 import { Part, CATEGORY_COLORS } from "@/lib/types";
 
 interface Props {
-  part: Part & { _id: string };
+  part: Part;
   onEdit: () => void;
   onDelete: () => void;
   onAdjust: (id: string, delta: number) => void;
@@ -24,7 +24,7 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <p className="font-medium text truncate">{part.name}</p>
+          <p className="font-medium text-sm truncate">{part.name}</p>
           <p className="text-xs text-base-content/50 mt-0.5 font-mono">
             {part.id} . {part.category}
           </p>
@@ -34,7 +34,7 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
         {/* Qty controls */}
         <div className="flex items-center gap-1.5 shrink-0">
           <button
-            className="bin btn-sm byn-ghost btn-square"
+            className="bin btn-xs byn-ghost btn-square"
             onClick={() => onAdjust(part._id, -1)}
             aria-label="Decrease quantity"
           >

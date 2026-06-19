@@ -8,7 +8,7 @@ export type Category =
   | "Other";
 
 export interface Part {
-  id: string;
+  partId: string;
   name: string;
   category: Category;
   qty: number;

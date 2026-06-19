@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: Params) {
   try {
     await dbConnect();
     const { id } = await params;
-    const part = await PartModel.findById(id).lean();
+    const part = await PartModel.findOne({ partId: id }).lean();
     if (!part) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -29,15 +29,12 @@ export async function PATCH(request: Request, { params }: Params) {
     const { id } = await params;
     const body = await request.json();
 
-    // Map frontend `id` field -> `partId` if present
-    if (body.id !== undefined) {
-      body.partId = body.id;
-      delete body.id;
-    }
+    // Strip Mongo internals so they never land in $set
+    const { _id, __v, createdAt, updatedAt, ...fields } = body;
 
-    const part = await PartModel.findByIdAndUpdate(
-      id,
-      { $set: body },
+    const part = await PartModel.findOneAndUpdate(
+      { partId: id },
+      { $set: fields },
       { returnDocument: "after", runValidators: true }
     ).lean();
 
@@ -56,7 +53,7 @@ export async function DELETE(_request: Request, { params }: Params) {
   try {
     await dbConnect();
     const { id } = await params;
-    const part = PartModel.findByIdAndDelete(id);
+    const part = PartModel.findOneAndDelete({ partId: id });
     if (!part) {
       return NextResponse.json({ error: "Part not found" }, { status: 404 });
     }

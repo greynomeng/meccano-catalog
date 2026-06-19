@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { Part, CATEGORIES, UNITS } from "@/lib/types";
 
 interface Props {
-  initial: Part & { _id: string };
+  initial: Part;
   mode: "add" | "edit";
-  onSave: (part: Part & { _id: string }) => void;
+  onSave: (p: Part) => void;
   onClose: () => void;
 }
 
@@ -22,9 +22,9 @@ export default function PartModal({ initial, mode, onSave, onClose }: Props) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  function handlkeSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!form.name.trim()) return;
+    if (!form.partId.trim() || !form.name.trim()) return;
     onSave(form);
   }
 
@@ -39,9 +39,41 @@ export default function PartModal({ initial, mode, onSave, onClose }: Props) {
           X
         </button>
         <h3 className="font-semibold text-lg mb-4">{mode === "add" ? "New part" : "Edit part"}</h3>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <label className="form-control">
+              <div className="label">
+                <span className="label-text">Part no.</span>
+              </div>
+              <input
+                className="input input-bordered input-sm"
+                type="text"
+                value={form.partId}
+                onChange={(e) => set("partId", e.target.value)}
+                placeholder="e.g. MEK-001"
+                required
+                autoFocus={mode === "add"}
+              />
+            </label>
+            <label className="form-control">
+              <div className="label">
+                <span className="label-text">Category</span>
+              </div>
+              <select
+                className="select select-bordered select-sm"
+                value={form.category}
+                onChange={(e) => set("category", e.target.value as Part["category"])}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
 
-        <form onSubmit={handlkeSubmit} className="flex flex-col gap-3">
-          <label className="form-control flex flex-col gap-1.5">
+          <label className="form-control">
             <div className="label">
               <span className="label-text">Part name</span>
             </div>
@@ -52,29 +84,12 @@ export default function PartModal({ initial, mode, onSave, onClose }: Props) {
               onChange={(e) => set("name", e.target.value)}
               placeholder="e.g. Angle Girder 48.5mm"
               required
-              autoFocus
+              autoFocus={mode === "edit"}
             />
           </label>
 
-          <label className="form-control flex flex-col gap-1.5">
-            <div className="label">
-              <span className="label-text">Category</span>
-            </div>
-            <select
-              className="select select-bordered select-sm"
-              value={form.category}
-              onChange={(e) => set("category", e.target.value as Part["category"])}
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </label>
-
           <div className="grid grid-cols-2 gap-3">
-            <label className="form-control flex flex-col gap-1.5">
+            <label className="form-control">
               <div className="label">
                 <span className="label-text">Quantity</span>
               </div>
@@ -86,8 +101,7 @@ export default function PartModal({ initial, mode, onSave, onClose }: Props) {
                 onChange={(e) => set("qty", parseInt(e.target.value) || 0)}
               />
             </label>
-
-            <label className="form-control flex flex-col gap-1.5">
+            <label className="form-control">
               <div className="label">
                 <span className="label-text">Unit</span>
               </div>
@@ -103,7 +117,7 @@ export default function PartModal({ initial, mode, onSave, onClose }: Props) {
             </label>
           </div>
 
-          <label className="form-control flex flex-col gap-1.5">
+          <label className="form-control">
             <div className="label">
               <span className="label-text">Note</span>
               <span className="label-text-alt text-base-content/40">optional</span>

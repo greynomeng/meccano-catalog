@@ -36,3 +36,17 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: `Failed to fetch parts: ${errorMessage}` });
   }
 }
+
+// POST /api/parts - create a new part
+export async function POST(request: Request) {
+  try {
+    await dbConnect();
+    const body = await request.json();
+
+    const part = await PartModel.create(body);
+    return NextResponse.json(part, { status: 201 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to create part";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+}
