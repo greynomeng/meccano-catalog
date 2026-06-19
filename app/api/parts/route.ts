@@ -24,11 +24,11 @@ export async function GET(request: Request) {
     const parts = await PartModel.find(filter).sort({ name: 1 }).lean();
 
     // Seed with defaults if the collection is empty
-    if (parts.length === 0 && !category && !query) {
-      await PartModel.insertMany(DEFAULT_PARTS.map((part) => ({ ...part, partId: part.id })));
-      const seeded = await PartModel.find({}).sort({ name: 1 }).lean();
-      return NextResponse.json(seeded);
-    }
+    // if (parts.length === 0 && !category && !query) {
+    //   await PartModel.insertMany(DEFAULT_PARTS.map((part) => ({ ...part, partId: part.id })));
+    //   const seeded = await PartModel.find({}).sort({ name: 1 }).lean();
+    //   return NextResponse.json(seeded);
+    // }
     return NextResponse.json(parts);
   } catch (err) {
     console.error("[GET /api/parts]", err);

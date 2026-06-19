@@ -9,6 +9,7 @@ function toPart(raw: any): Part {
   return {
     partId: raw.partId,
     name: raw.name,
+    description: raw.description,
     category: raw.category,
     qty: raw.qty,
     unit: raw.unit,

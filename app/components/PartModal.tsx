@@ -6,13 +6,14 @@ import { Part, CATEGORIES, UNITS } from "@/lib/types";
 interface Props {
   initial: Part;
   mode: "add" | "edit";
+  uniqueNames?: string[];
   onSave: (p: Part) => void;
   onClose: () => void;
 }
 
-export default function PartModal({ initial, mode, onSave, onClose }: Props) {
+export default function PartModal({ initial, mode, uniqueNames = [], onSave, onClose }: Props) {
   const [form, setForm] = useState(initial);
-
+  console.log(uniqueNames);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm(initial);
@@ -81,11 +82,17 @@ export default function PartModal({ initial, mode, onSave, onClose }: Props) {
               className="input input-bordered input-sm"
               type="text"
               value={form.name}
+              list="part-names-list"
               onChange={(e) => set("name", e.target.value)}
               placeholder="e.g. Angle Girder 48.5mm"
               required
               autoFocus={mode === "edit"}
             />
+            <datalist id="part-names-list">
+              {uniqueNames.map((name) => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
           </label>
 
           <div className="grid grid-cols-2 gap-3">

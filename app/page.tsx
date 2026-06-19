@@ -19,6 +19,7 @@ export default function Home() {
   const blankPart = (): Part => ({
     partId: "",
     name: "",
+    description: "",
     category: "Structural",
     qty: 1,
     unit: "pcs",
@@ -51,6 +52,10 @@ export default function Home() {
   }
 
   const totalQty = parts.reduce((a, p) => a + p.qty, 0);
+
+  // 1. Extract just the names and strip out duplicates using a Set
+  const uniqueNames = Array.from(new Set(parts.map((part) => part.name)));
+  console.log(uniqueNames);
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
@@ -119,7 +124,7 @@ export default function Home() {
             className={`badge badge-xl gap-1.5 cursor-pointer border transition-colors ${
               catFilter === cat
                 ? "badge-primary border-primary"
-                : "badge-ghost border-base-300 hover: border-base-content/30"
+                : "badge-ghost border-base-300 hover:"
             }`}
           >
             {cat !== ALL && (
@@ -162,6 +167,7 @@ export default function Home() {
         <PartModal
           initial={modal.part}
           mode={modal.mode}
+          uniqueNames={uniqueNames}
           onSave={handleSave}
           onClose={() => setModal(null)}
         />

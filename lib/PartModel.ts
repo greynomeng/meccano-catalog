@@ -4,6 +4,7 @@ import { Category, CATEGORIES, UNITS } from "./types";
 export interface PartDocument extends Document {
   partId: string; // Human-readable ID e.g. MEK-001
   name: string;
+  description: string;
   category: Category;
   qty: number;
   unit: string;
@@ -23,6 +24,11 @@ const PartSchema = new Schema<PartDocument>(
     name: {
       type: String,
       required: [true, "Name is required"],
+      trim: true,
+      maxlength: [120, "Name must be 120 characters or fewer"]
+    },
+    description: {
+      type: String,
       trim: true,
       maxlength: [120, "Name must be 120 characters or fewer"]
     },

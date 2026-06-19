@@ -24,9 +24,11 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm truncate">{part.name}</p>
+          <p className="font-medium text-sm truncate">
+            {part.name} {part.description && `(${part.description})`}
+          </p>
           <p className="text-xs text-base-content/50 mt-0.5 font-mono">
-            {part.id} . {part.category}
+            {part.partId} . {part.category}
           </p>
           {part.note && <p className="text-xs text-base-content/40 italic mt-0.5">{part.note}</p>}
         </div>
@@ -35,7 +37,7 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             className="bin btn-xs byn-ghost btn-square"
-            onClick={() => onAdjust(part._id, -1)}
+            onClick={() => onAdjust(part.partId, -1)}
             aria-label="Decrease quantity"
           >
             -
@@ -43,7 +45,7 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
           <span className="text-sm font-semibold tabular-nums w-9 text-center">{part.qty}</span>
           <button
             className="btn btn-xs btn-ghost btn-square"
-            onClick={() => onAdjust(part._id, 1)}
+            onClick={() => onAdjust(part.partId, 1)}
             aria-label="Increase quantity"
           >
             +

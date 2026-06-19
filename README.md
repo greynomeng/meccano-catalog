@@ -1,3 +1,33 @@
+// app/page.tsx (Server Component)
+import dbConnect from '@/lib/dbConnect';
+import ItemModel from '@/models/Item';
+
+async function getDropdownNames() {
+  await dbConnect();
+  
+  // Scans all documents and returns an array of unique strings, 
+  // perfectly filtering out the duplicates by design.
+  return await ItemModel.distinct('name'); 
+}
+
+export default async function Page() {
+  const uniqueNames = await getDropdownNames();
+
+  return (
+    <select className="border p-2 rounded-md text-sm">
+      <option value="">Select a name...</option>
+      {uniqueNames.map((name) => (
+        <option key={name} value={name}>
+          {name}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
