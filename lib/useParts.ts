@@ -14,7 +14,7 @@ interface RawPart {
   note: string;
 }
 
-function toFrontEnd(raw: RawPart): Part & { _id: string } {
+function toFrontend(raw: RawPart): Part & { _id: string } {
   return {
     _id: raw._id,
     id: raw.partId,
@@ -40,12 +40,12 @@ export function useParts() {
       if (query) {
         params.set("q", query);
       }
-      const response = await fetch(`/api/parts/${params}`);
-      if (!response.ok) {
-        throw new Error(await response.text());
+      const responseponse = await fetch(`/api/parts/${params}`);
+      if (!responseponse.ok) {
+        throw new Error(await responseponse.text());
       }
-      const data: RawPart[] = await response.json();
-      setParts(data.map(toFrontEnd));
+      const data: RawPart[] = await responseponse.json();
+      setParts(data.map(toFrontend));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load parts");
     } finally {
@@ -58,5 +58,39 @@ export function useParts() {
     fetchParts();
   }, [fetchParts]);
 
-  return { parts, loaded, error, refetch: fetchParts };
+  async function addPart(part: Part) {
+    try {
+      const responseponse = await fetch("/api/parts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(part)
+      });
+      if (!responseponse.ok) {
+        throw new Error(await responseponse.text());
+      }
+      const raw: RawPart = await responseponse.json();
+      setParts((prev) => [toFrontend(raw), ...prev]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add part");
+    }
+  }
+
+  async function updatePart(part: Part & { _id: string }) {
+    try {
+      const response = await fetch(`/api/parts/${part._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(part)
+      });
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      const raw: RawPart = await response.json();
+      setParts((prev) => prev.map((p) => (p._id === part._id ? toFrontend(raw) : p)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update part");
+    }
+  }
+
+  return { parts, loaded, error, addPart, updatePart, refetch: fetchParts };
 }

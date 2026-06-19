@@ -1,16 +1,31 @@
 "use client";
 
-import { CATEGORIES, CATEGORY_COLORS } from "@/lib/types";
+import { Part, CATEGORIES, CATEGORY_COLORS } from "@/lib/types";
 import { useParts } from "@/lib/useParts";
 import { useState } from "react";
 import PartRow from "./components/PartRow";
+import PartModal from "./components/PartModal";
 
 const ALL = "All";
+type PartWithId = Part & { _id: string };
 
 export default function Home() {
-  const { parts, loaded, error } = useParts();
+  const { parts, loaded, error, addPart, updatePart } = useParts();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState(ALL);
+  const [modal, setModal] = useState<{ mode: "add" | "edit"; part: PartWithId } | null>(null);
+
+  function blankPart(): PartWithId {
+    return {
+      _id: "",
+      id: "",
+      name: "",
+      category: "Structural",
+      qty: 1,
+      unit: "pcs",
+      note: ""
+    };
+  }
 
   const filtered = parts.filter((part) => {
     const query = search.toLowerCase();
@@ -21,6 +36,15 @@ export default function Home() {
       part.category.toLowerCase().includes(query);
     return matchSearch && (catFilter === ALL || part.category === catFilter);
   });
+
+  async function handleSave(part: PartWithId) {
+    if (modal?.mode === "add") {
+      await addPart(part);
+    } else {
+      await updatePart(part);
+    }
+    setModal(null);
+  }
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
@@ -72,7 +96,12 @@ export default function Home() {
             aria-label="Search parts"
           />
         </label>
-        <button className="btn btn-primary">+ Add part</button>
+        <button
+          className="btn btn-primary"
+          onClick={() => setModal({ mode: "add", part: blankPart() })}
+        >
+          + Add part
+        </button>
       </div>
 
       {/* Category filter chips */}
@@ -107,13 +136,25 @@ export default function Home() {
             <PartRow
               key={part._id}
               part={part}
-              onEdit={() => {}}
+              onEdit={() => {
+                setModal({ mode: "edit", part: { ...part } });
+              }}
               onDelete={() => {}}
               onAdjust={() => {}}
             />
           ))
         )}
       </div>
+
+      {/* Modal */}
+      {modal && (
+        <PartModal
+          initial={modal.part}
+          mode={modal.mode}
+          onSave={(part) => handleSave(part as PartWithId)}
+          onClose={() => setModal(null)}
+        />
+      )}
     </main>
   );
 }
