@@ -13,7 +13,7 @@ interface Props {
 
 export default function PartModal({ initial, mode, uniqueNames = [], onSave, onClose }: Props) {
   const [form, setForm] = useState(initial);
-  console.log(uniqueNames);
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm(initial);
@@ -43,99 +43,115 @@ export default function PartModal({ initial, mode, uniqueNames = [], onSave, onC
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-3">
             <label className="form-control">
-              <div className="label">
-                <span className="label-text">Part no.</span>
-              </div>
-              <input
-                className="input input-bordered input-sm"
-                type="text"
-                value={form.partId}
-                onChange={(e) => set("partId", e.target.value)}
-                placeholder="e.g. MEK-001"
-                required
-                autoFocus={mode === "add"}
-              />
+              <fieldset className="fieldset">
+                <legend className="fieldset-legend">Part No.</legend>
+                <input
+                  className="input input-bordered input-sm"
+                  type="text"
+                  value={form.partId}
+                  onChange={(e) => set("partId", e.target.value)}
+                  placeholder="e.g. 12B"
+                  required
+                  autoFocus={mode === "add"}
+                />
+              </fieldset>
             </label>
+
             <label className="form-control">
-              <div className="label">
-                <span className="label-text">Category</span>
-              </div>
-              <select
-                className="select select-bordered select-sm"
-                value={form.category}
-                onChange={(e) => set("category", e.target.value as Part["category"])}
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+              <fieldset className="fieldset">
+                <legend className="fieldset-legend">Category</legend>
+                <select
+                  className="select select-bordered select-sm"
+                  value={form.category}
+                  onChange={(e) => set("category", e.target.value as Part["category"])}
+                >
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </fieldset>
             </label>
           </div>
 
           <label className="form-control">
-            <div className="label">
-              <span className="label-text">Part name</span>
-            </div>
-            <input
-              className="input input-bordered input-sm"
-              type="text"
-              value={form.name}
-              list="part-names-list"
-              onChange={(e) => set("name", e.target.value)}
-              placeholder="e.g. Angle Girder 48.5mm"
-              required
-              autoFocus={mode === "edit"}
-            />
-            <datalist id="part-names-list">
-              {uniqueNames.map((name) => (
-                <option key={name} value={name} />
-              ))}
-            </datalist>
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Part name</legend>
+              <input
+                className="input input-bordered input-sm w-full"
+                type="text"
+                value={form.name}
+                list="part-names-list"
+                onChange={(e) => set("name", e.target.value)}
+                placeholder="e.g. Angle Girder 48.5mm"
+                required
+                autoFocus={mode === "edit"}
+              />
+              <datalist id="part-names-list">
+                {uniqueNames.map((name) => (
+                  <option key={name} value={name} />
+                ))}
+              </datalist>
+            </fieldset>
+          </label>
+
+          <label className="form-control">
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Description</legend>
+              <input
+                className="input input-bordered input-sm w-full"
+                type="text"
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+                placeholder="e.g. 5-hole, 12 cm"
+              />
+            </fieldset>
           </label>
 
           <div className="grid grid-cols-2 gap-3">
             <label className="form-control">
-              <div className="label">
-                <span className="label-text">Quantity</span>
-              </div>
-              <input
-                className="input input-bordered input-sm"
-                type="number"
-                min={0}
-                value={form.qty}
-                onChange={(e) => set("qty", parseInt(e.target.value) || 0)}
-              />
+              <fieldset className="fieldset">
+                <legend className="fieldset-legend">Quantity</legend>
+
+                <input
+                  className="input input-bordered input-sm"
+                  type="number"
+                  min={0}
+                  value={form.qty}
+                  onChange={(e) => set("qty", parseInt(e.target.value) || 0)}
+                />
+              </fieldset>
             </label>
+
             <label className="form-control">
-              <div className="label">
-                <span className="label-text">Unit</span>
-              </div>
-              <select
-                className="select select-bordered select-sm"
-                value={form.unit}
-                onChange={(e) => set("unit", e.target.value)}
-              >
-                {UNITS.map((u) => (
-                  <option key={u}>{u}</option>
-                ))}
-              </select>
+              <fieldset>
+                <legend className="fieldset-legend">Unit</legend>
+                <select
+                  className="select select-bordered select-sm"
+                  value={form.unit}
+                  onChange={(e) => set("unit", e.target.value)}
+                >
+                  {UNITS.map((u) => (
+                    <option key={u}>{u}</option>
+                  ))}
+                </select>
+              </fieldset>
             </label>
           </div>
 
           <label className="form-control">
-            <div className="label">
-              <span className="label-text">Note</span>
-              <span className="label-text-alt text-base-content/40">optional</span>
-            </div>
-            <input
-              className="input input-bordered input-sm"
-              type="text"
-              value={form.note}
-              onChange={(e) => set("note", e.target.value)}
-              placeholder="e.g. from set #10030"
-            />
+            <fieldset>
+              <legend className="fieldset-legend">Note</legend>
+              <input
+                className="input input-bordered input-sm w-full"
+                type="text"
+                value={form.note}
+                onChange={(e) => set("note", e.target.value)}
+                placeholder="e.g. from set #10030"
+              />
+              <p className="label">Optional</p>
+            </fieldset>
           </label>
 
           <div className="modal-action mt-1">
