@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/dbConnect";
 import PartModel from "@/lib/PartModel";
 
 interface Params {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 // GET /api/parts/[id]
-export async function GET(_request: Request, { params }: Params) {
+export async function GET(_request: NextRequest, { params }: Params) {
   try {
     await dbConnect();
     const { id } = await params;
@@ -23,7 +23,7 @@ export async function GET(_request: Request, { params }: Params) {
 }
 
 // PATCH /api/parts/[id] - partial update (name, category, qty, unit, note)
-export async function PATCH(request: Request, { params }: Params) {
+export async function PATCH(request: NextRequest, { params }: Params) {
   try {
     await dbConnect();
     const { id } = await params;
@@ -49,7 +49,7 @@ export async function PATCH(request: Request, { params }: Params) {
 }
 
 // DELETE /api/parts/[id]
-export async function DELETE(_request: Request, { params }: Params) {
+export async function DELETE(_request: NextRequest, { params }: Params) {
   try {
     await dbConnect();
     const { id } = await params;

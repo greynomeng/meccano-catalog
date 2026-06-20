@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { dbConnect } from "@/lib/dbConnect";
 import PartModel from "@/lib/PartModel";
-import { DEFAULT_PARTS } from "@/lib/types";
+// import { DEFAULT_PARTS } from "@/lib/types";
 
 // GET /api/parts — list all parts, optional ?category= and ?q= filters
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     await dbConnect();
 
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
 }
 
 // POST /api/parts - create a new part
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     const body = await request.json();
