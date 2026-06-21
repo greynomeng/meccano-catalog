@@ -12,6 +12,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
     await dbConnect();
     const { id } = await params;
     const part = await PartModel.findOne({ partId: id }).lean();
+
     if (!part) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -53,7 +54,7 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   try {
     await dbConnect();
     const { id } = await params;
-    const part = PartModel.findOneAndDelete({ partId: id });
+    const part = await PartModel.findOneAndDelete({ partId: id });
     if (!part) {
       return NextResponse.json({ error: "Part not found" }, { status: 404 });
     }

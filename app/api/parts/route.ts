@@ -11,7 +11,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
     const query = searchParams.get("q");
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: Record<string, any> = {};
     if (category && category !== "All") {
@@ -20,7 +19,6 @@ export async function GET(request: NextRequest) {
     if (query) {
       filter.$text = { $search: query };
     }
-
     const parts = await PartModel.find(filter).sort({ name: 1 }).lean();
 
     // Seed with defaults if the collection is empty

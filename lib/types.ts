@@ -1,10 +1,14 @@
 export type Category =
-  | "Structural"
-  | "Gears & Drives"
-  | "Fasteners"
-  | "Wheels & Axles"
-  | "Plates & Brackets"
-  | "Electrical"
+  | "Plates"
+  | "Strips"
+  | "Girders"
+  | "Brackets"
+  | "Axles"
+  | "Wheels"
+  | "Gears"
+  | "Bolts & Nuts"
+  | "Pulleys"
+  | "Motors & Electrical"
   | "Other";
 
 export interface Part {
@@ -18,23 +22,38 @@ export interface Part {
 }
 
 export const CATEGORIES: Category[] = [
-  "Structural",
-  "Gears & Drives",
-  "Fasteners",
-  "Wheels & Axles",
-  "Plates & Brackets",
-  "Electrical",
+  "Plates",
+  "Strips",
+  "Girders",
+  "Brackets",
+  "Axles",
+  "Wheels",
+  "Gears",
+  "Bolts & Nuts",
+  "Pulleys",
+  "Motors & Electrical",
   "Other"
 ];
 
 export const CATEGORY_COLORS: Record<Category, string> = {
-  Structural: "#378add",
-  "Gears & Drives": "#639922",
-  Fasteners: "#ba7517",
-  "Wheels & Axles": "#993556",
-  "Plates & Brackets": "#533ab7",
-  Electrical: "#1d9e75",
+  Plates: "#533ab7",
+  Strips: "#378add",
+  Girders: "#378add",
+  Brackets: "#533ab7",
+  Axles: "#993556",
+  Wheels: "#993556",
+  Gears: "#639922",
+  "Bolts & Nuts": "#ba7517",
+  Pulleys: "#639922",
+  "Motors & Electrical": "#1d9e75",
   Other: "#888780"
+  // Structural: "#378add",
+  // "Gears & Drives": "#639922",
+  // Fasteners: "#ba7517",
+  // "Wheels & Axles": "#993556",
+  // "Plates & Brackets": "#533ab7",
+  // Electrical: "#1d9e75",
+  // Other: "#888780"
 };
 
 export const UNITS = ["pcs", "sets", "m", "mm", "kg", "g"];
