@@ -20,7 +20,7 @@ export default function Home() {
     partId: "",
     name: "",
     description: "",
-    category: "",
+    category: "Other",
     qty: 1,
     unit: "pcs",
     note: ""
