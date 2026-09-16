@@ -1,3 +1,5 @@
+// lib/types.ts
+
 export type Category =
   | "Plates"
   | "Strips"
@@ -19,6 +21,7 @@ export interface Part {
   qty: number;
   unit: string;
   note: string;
+  imageUrl?: string;
 }
 
 export const CATEGORIES: Category[] = [

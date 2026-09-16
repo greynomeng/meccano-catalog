@@ -1,3 +1,5 @@
+// components/page.tsx
+
 "use client";
 
 import { Part, CATEGORIES, CATEGORY_COLORS } from "@/lib/types";
@@ -23,7 +25,8 @@ export default function Home() {
     category: "Other",
     qty: 1,
     unit: "pcs",
-    note: ""
+    note: "",
+    imageUrl: ""
   });
 
   const filtered = parts.filter((part) => {
@@ -36,11 +39,41 @@ export default function Home() {
     return matchSearch && (catFilter === ALL || part.category === catFilter);
   });
 
-  async function handleSave(p: Part) {
+  async function handleSave(part: Part, imageFile?: File | null) {
+    let partToSave = part;
+
+    /*
+     * Upload the image first, if a new one
+     * was seleceted.
+     *
+     * The actual filesystem operation is
+     * performed server-side by /api/upload
+     */
+    if (imageFile) {
+      const formData = new FormData();
+
+      formData.append("file", imageFile);
+      formData.append("partId", partToSave.partId);
+
+      const uploadResponse = await fetch("/api/upload", { method: "POST", body: formData });
+
+      const uploadData = await uploadResponse.json();
+
+      if (!uploadResponse.ok) {
+        throw new Error(uploadData.error || "Image upload failed");
+      }
+
+      partToSave = { ...partToSave, imageUrl: uploadData.imageUrl };
+    }
+
+    /*
+     * Only close the modal after the
+     * database operation succeeds.
+     */
     if (modal?.mode === "add") {
-      await addPart(p);
+      await addPart(partToSave);
     } else {
-      await updatePart(p);
+      await updatePart(partToSave);
     }
     setModal(null);
   }
@@ -55,7 +88,7 @@ export default function Home() {
 
   // 1. Extract just the names and strip out duplicates using a Set
   const uniqueNames = Array.from(new Set(parts.map((part) => part.name)));
-  console.log(uniqueNames);
+  // console.log(uniqueNames);
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">

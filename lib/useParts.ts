@@ -1,3 +1,5 @@
+// lib/useParts.ts
+
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
@@ -13,7 +15,8 @@ function toPart(raw: any): Part {
     category: raw.category,
     qty: raw.qty,
     unit: raw.unit,
-    note: raw.note ?? ""
+    note: raw.note ?? "",
+    imageUrl: raw.imageUrl ?? ""
   };
 }
 
@@ -24,21 +27,33 @@ export function useParts() {
 
   const fetchParts = useCallback(async (category?: string, q?: string) => {
     try {
+      setError(null);
+
       const params = new URLSearchParams();
+
       if (category && category !== "All") {
         params.set("category", category);
       }
+
       if (q) {
         params.set("q", q);
       }
-      const res = await fetch(`/api/parts/${params}`);
+
+      const query = params.toString();
+
+      const res = await fetch(query ? `/api/parts/${query}` : "/api/parts");
+
       if (!res.ok) {
         throw new Error(await res.text());
       }
+
       const data = await res.json();
+
       setParts(data.map(toPart));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load parts");
+      const message = err instanceof Error ? err.message : "Failed to load parts.";
+
+      setError(message);
     } finally {
       setLoaded(true);
     }
@@ -51,68 +66,107 @@ export function useParts() {
 
   async function addPart(part: Part) {
     try {
+      setError(null);
+
       const res = await fetch("/api/parts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(part)
       });
+
       if (!res.ok) {
         throw new Error(await res.text());
       }
+
       const created = toPart(await res.json());
+
       setParts((prev) => [created, ...prev]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add part");
+      const message = err instanceof Error ? err.message : "Failed to add part.";
+
+      setError(message);
+
+      throw err;
     }
   }
 
   async function updatePart(part: Part) {
     try {
+      setError(null);
+
       const res = await fetch(`/api/parts/${part.partId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(part)
       });
+
       if (!res.ok) {
         throw new Error(await res.text());
       }
+
       const updated = toPart(await res.json());
+
       setParts((prev) => prev.map((p) => (p.partId === updated.partId ? updated : p)));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update part");
+      const message = err instanceof Error ? err.message : "Failed to update part.";
+
+      setError(message);
+
+      throw err;
     }
   }
 
   async function deletePart(partId: string) {
     try {
+      setError(null);
+
       const res = await fetch(`/api/parts/${partId}`, { method: "DELETE" });
+
       if (!res.ok) {
         throw new Error(await res.text());
       }
+
       setParts((prev) => prev.filter((p) => p.partId !== partId));
     } catch (err) {
       console.error("deletePart-err:", err);
-      setError(err instanceof Error ? err.message : "Failed to delete part");
+
+      const message = err instanceof Error ? err.message : "Failed to delete part.";
+
+      setError(message);
+
+      throw err;
     }
   }
 
   async function adjustQty(partId: string, delta: number) {
     const part = parts.find((p) => p.partId === partId);
-    if (!part) return;
+
+    if (!part) {
+      return;
+    }
+
     const qty = Math.max(0, part.qty + delta);
+
     try {
+      setError(null);
+
       const res = await fetch(`/api/parts/${partId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ qty })
       });
+
       if (!res.ok) {
         throw new Error(await res.text());
       }
+
       const updated: Part = await res.json();
+
       setParts((prev) => prev.map((p) => (p.partId === partId ? updated : p)));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to adjust quantity");
+      const message = err instanceof Error ? err.message : "Failed to adjust quantity.";
+
+      setError(message);
     }
   }
 

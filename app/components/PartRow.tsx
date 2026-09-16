@@ -1,4 +1,8 @@
+// components/PartRow.tsx
+
 "use client";
+
+import Image from "next/image";
 
 import { Part, CATEGORY_COLORS } from "@/lib/types";
 
@@ -15,6 +19,16 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
   return (
     <div className="card card-compact bg-base-100 shadow-sm border border-base-200 hover:border-base-300 transition-colors">
       <div className="card-body flex-row items-center gap-3">
+        {/* Image */}
+        <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-base-200 bg-base-200 shrink-0">
+          {part.imageUrl ? (
+            <Image src={part.imageUrl} alt={part.name} fill sizes="56px" className="object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-base-content/25 text-xs">
+              —
+            </div>
+          )}
+        </div>
         {/* Category dot */}
         <span
           className="w-2.5 h-2.5 rounded-full shrink-0"

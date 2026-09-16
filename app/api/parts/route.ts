@@ -9,13 +9,16 @@ export async function GET(request: NextRequest) {
     await dbConnect();
 
     const { searchParams } = new URL(request.url);
+
     const category = searchParams.get("category");
     const query = searchParams.get("q");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: Record<string, any> = {};
+
     if (category && category !== "All") {
       filter.category = category;
     }
+
     if (query) {
       filter.$text = { $search: query };
     }
@@ -27,6 +30,7 @@ export async function GET(request: NextRequest) {
     //   const seeded = await PartModel.find({}).sort({ name: 1 }).lean();
     //   return NextResponse.json(seeded);
     // }
+
     return NextResponse.json(parts);
   } catch (err) {
     console.error("[GET /api/parts]", err);

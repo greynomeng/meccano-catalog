@@ -1,3 +1,5 @@
+// lib/PartModel.ts
+
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { Category, CATEGORIES, UNITS } from "./types";
 
@@ -9,6 +11,7 @@ export interface PartDocument extends Document {
   qty: number;
   unit: string;
   note: string;
+  imageUrl: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -53,6 +56,10 @@ const PartSchema = new Schema<PartDocument>(
       type: String,
       default: "",
       maxlength: [300, "Note must be 300 characters or fewer"]
+    },
+    imageUrl: {
+      type: String,
+      default: ""
     }
   },
   {
