@@ -8,14 +8,19 @@ import { useState } from "react";
 import PartRow from "./components/PartRow";
 import PartModal from "./components/PartModal";
 import ConfirmDelete from "./components/ConfirmDelete";
+import { BsPlus } from "react-icons/bs";
 
 const ALL = "All";
 
 export default function Home() {
-  const { parts, loaded, error, addPart, updatePart, deletePart, adjustQty } = useParts();
+  const { parts, loaded, error, addPart, updatePart, deletePart, adjustQty } =
+    useParts();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState(ALL);
-  const [modal, setModal] = useState<{ mode: "add" | "edit"; part: Part } | null>(null);
+  const [modal, setModal] = useState<{
+    mode: "add" | "edit";
+    part: Part;
+  } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Part | null>(null);
 
   const blankPart = (): Part => ({
@@ -26,7 +31,7 @@ export default function Home() {
     qty: 1,
     unit: "pcs",
     note: "",
-    imageUrl: ""
+    imageUrl: "",
   });
 
   const filtered = parts.filter((part) => {
@@ -55,7 +60,10 @@ export default function Home() {
       formData.append("file", imageFile);
       formData.append("partId", partToSave.partId);
 
-      const uploadResponse = await fetch("/api/upload", { method: "POST", body: formData });
+      const uploadResponse = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
       const uploadData = await uploadResponse.json();
 
@@ -101,8 +109,12 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <h1 className="text-2xl font-semibold leading-tight">Meccano Inventory</h1>
-            <p className="text-xl text-base-content/50">Parts catalogue &amp; stock</p>
+            <h1 className="text-2xl font-semibold leading-tight">
+              Meccano Inventory
+            </h1>
+            <p className="text-xl text-base-content/50">
+              Parts catalogue &amp; stock
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -111,7 +123,9 @@ export default function Home() {
             <div className="stat-desc">Types</div>
           </div>
           <div className="stat bg-base-100 rounded-box py-2 px-4 shadow-sm">
-            <div className="stat-value text-lg">{totalQty.toLocaleString()}</div>
+            <div className="stat-value text-lg">
+              {totalQty.toLocaleString()}
+            </div>
             <div className="stat-desc">Total</div>
           </div>
         </div>
@@ -127,7 +141,12 @@ export default function Home() {
       {/* Toolbar */}
       <div className="flex gap-2 mb-3 flex-wrap">
         <label className="input input-bordered flex items-center gap-2 flex-1 min-w-40">
-          <svg className="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-4 h-4 opacity-40"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.35-4.35" />
           </svg>
@@ -144,12 +163,17 @@ export default function Home() {
           className="btn btn-primary"
           onClick={() => setModal({ mode: "add", part: blankPart() })}
         >
-          + Add part
+          <BsPlus size={24} />
+          Add part
         </button>
       </div>
 
       {/* Category filter chips */}
-      <div className="flex flex-wrap gap-1.5 mb-4" role="group" aria-label="Filter by category">
+      <div
+        className="flex flex-wrap gap-1.5 mb-4"
+        role="group"
+        aria-label="Filter by category"
+      >
         {[ALL, ...CATEGORIES].map((cat) => (
           <button
             key={cat}
@@ -163,7 +187,10 @@ export default function Home() {
             {cat !== ALL && (
               <span
                 className="w-2 h-2 rounded-full shrink-0"
-                style={{ background: CATEGORY_COLORS[cat as keyof typeof CATEGORY_COLORS] }}
+                style={{
+                  background:
+                    CATEGORY_COLORS[cat as keyof typeof CATEGORY_COLORS],
+                }}
               />
             )}
             {cat}

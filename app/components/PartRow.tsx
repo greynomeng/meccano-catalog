@@ -5,6 +5,7 @@
 import Image from "next/image";
 
 import { Part, CATEGORY_COLORS } from "@/lib/types";
+import { BsPencilSquare, BsTrash } from "react-icons/bs";
 
 interface Props {
   part: Part;
@@ -22,7 +23,13 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
         {/* Image */}
         <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-base-200 bg-base-200 shrink-0">
           {part.imageUrl ? (
-            <Image src={part.imageUrl} alt={part.name} fill sizes="56px" className="object-cover" />
+            <Image
+              src={part.imageUrl}
+              alt={part.name}
+              fill
+              sizes="56px"
+              className="object-cover"
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-base-content/25 text-xs">
               —
@@ -44,7 +51,11 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
           <p className="text-xs text-base-content/50 mt-0.5 font-mono">
             {part.partId} . {part.category}
           </p>
-          {part.note && <p className="text-xs text-base-content/40 italic mt-0.5">{part.note}</p>}
+          {part.note && (
+            <p className="text-xs text-base-content/40 italic mt-0.5">
+              {part.note}
+            </p>
+          )}
         </div>
 
         {/* Qty controls */}
@@ -56,7 +67,9 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
           >
             -
           </button>
-          <span className="text-sm font-semibold tabular-nums w-9 text-center">{part.qty}</span>
+          <span className="text-sm font-semibold tabular-nums w-9 text-center">
+            {part.qty}
+          </span>
           <button
             className="btn btn-xs btn-ghost btn-square"
             onClick={() => onAdjust(part.partId, 1)}
@@ -70,12 +83,12 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
         {/* Actions */}
         <div className="flex gap-1 shrink-0">
           <button
-            className="btn btn-xs btn-ghost btn-square"
+            className="btn btn-xs btn-ghost btn-square me-4"
             onClick={onEdit}
             aria-label="Edit part"
             title="Edit"
           >
-            ✎
+            <BsPencilSquare size={20} className="text-success" />
           </button>
           <button
             className="btn btn-xs btn-ghost btn-square text-error hover:bg-error/10"
@@ -83,7 +96,7 @@ export default function PartRow({ part, onEdit, onDelete, onAdjust }: Props) {
             aria-label="Delete part"
             title="Delete"
           >
-            🗑
+            <BsTrash size={20} className="text-error" />
           </button>
         </div>
       </div>

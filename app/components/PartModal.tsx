@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ALLOWED_IMAGE_TYPES /*MAX_IMAGE_SIZE*/ } from "@/lib/constants";
 import { Part, CATEGORIES, UNITS } from "@/lib/types";
+import { BsFloppy, BsXCircle } from "react-icons/bs";
 
 interface Props {
   initial: Part;
@@ -15,7 +16,13 @@ interface Props {
   onClose: () => void;
 }
 
-export default function PartModal({ initial, mode, uniqueNames = [], onSave, onClose }: Props) {
+export default function PartModal({
+  initial,
+  mode,
+  uniqueNames = [],
+  onSave,
+  onClose,
+}: Props) {
   const [form, setForm] = useState<Part>(initial);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -50,7 +57,11 @@ export default function PartModal({ initial, mode, uniqueNames = [], onSave, onC
       return;
     }
 
-    if (!ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number])) {
+    if (
+      !ALLOWED_IMAGE_TYPES.includes(
+        file.type as (typeof ALLOWED_IMAGE_TYPES)[number],
+      )
+    ) {
       setImageError("Only JPEG, PNG, and WebP images are allowed.");
       return;
     }
@@ -84,7 +95,10 @@ export default function PartModal({ initial, mode, uniqueNames = [], onSave, onC
     try {
       setSaving(true);
 
-      await onSave({ ...form, partId: form.partId.trim(), name: form.name.trim() }, imageFile);
+      await onSave(
+        { ...form, partId: form.partId.trim(), name: form.name.trim() },
+        imageFile,
+      );
     } finally {
       setSaving(false);
     }
@@ -102,7 +116,9 @@ export default function PartModal({ initial, mode, uniqueNames = [], onSave, onC
           X
         </button>
 
-        <h3 className="font-semibold text-lg mb-4">{mode === "add" ? "New part" : "Edit part"}</h3>
+        <h3 className="font-semibold text-lg mb-4">
+          {mode === "add" ? "New part" : "Edit part"}
+        </h3>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-3">
@@ -129,7 +145,9 @@ export default function PartModal({ initial, mode, uniqueNames = [], onSave, onC
                 <select
                   className="select select-bordered select-sm"
                   value={form.category}
-                  onChange={(e) => set("category", e.target.value as Part["category"])}
+                  onChange={(e) =>
+                    set("category", e.target.value as Part["category"])
+                  }
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c} value={c}>
@@ -211,16 +229,22 @@ export default function PartModal({ initial, mode, uniqueNames = [], onSave, onC
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   className="file-input file-input-bordered file-input-sm w-full"
-                  onChange={(e) => handleImageChange(e.target.files?.[0] ?? null)}
+                  onChange={(e) =>
+                    handleImageChange(e.target.files?.[0] ?? null)
+                  }
                   disabled={saving}
                 />
 
                 {/* <p className="text-xs text-base-content/50 mt-1">
                   JPEG, PNG or WebP · max 5 MB
                 </p> */}
-                <p className="text-xs text-base-content/50 mt-1">JPEG, PNG or WebP</p>
+                <p className="text-xs text-base-content/50 mt-1">
+                  JPEG, PNG or WebP
+                </p>
 
-                {imageError && <p className="text-xs text-error mt-1">{imageError}</p>}
+                {imageError && (
+                  <p className="text-xs text-error mt-1">{imageError}</p>
+                )}
               </div>
             </div>
           </fieldset>
@@ -277,16 +301,24 @@ export default function PartModal({ initial, mode, uniqueNames = [], onSave, onC
             {/* Cancel button */}
             <button
               type="button"
-              className="btn btn-sm btn-ghost"
+              className="btn btn-sm btn-outline"
               onClick={onClose}
               disabled={saving}
             >
+              <BsXCircle />
               Cancel
             </button>
 
             {/* Submit button */}
-            <button type="submit" className="btn btn-sm btn-primary" disabled={saving}>
-              {saving && <span className="loading loading-spinner loading-xs" />}
+            <button
+              type="submit"
+              className="btn btn-sm btn-primary"
+              disabled={saving}
+            >
+              <BsFloppy />
+              {saving && (
+                <span className="loading loading-spinner loading-xs" />
+              )}
               {mode === "add" ? "Add part" : "Save changes"}
             </button>
           </div>
