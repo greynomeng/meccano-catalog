@@ -1,3 +1,5 @@
+// app\api\parts\[id]\route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { dbConnect } from "@/lib/dbConnect";
@@ -61,7 +63,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     const part = await PartModel.findOneAndUpdate(
       { partId: id },
       { $set: fields },
-      { returnDocument: "after", runValidators: true }
+      { returnDocument: "after", runValidators: true },
     ).lean();
 
     if (!part) {
@@ -92,7 +94,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
     return NextResponse.json(part);
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to update part";
+    const message =
+      err instanceof Error ? err.message : "Failed to update part";
 
     console.error("PATCH /api/parts/[id]", err);
 
@@ -143,6 +146,9 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     return NextResponse.json({ deleted: true });
   } catch (err) {
     console.error("DELETE /api/parts/[id]", err);
-    return NextResponse.json({ error: `Failed to delete part: ${err}` }, { status: 500 });
+    return NextResponse.json(
+      { error: `Failed to delete part: ${err}` },
+      { status: 500 },
+    );
   }
 }

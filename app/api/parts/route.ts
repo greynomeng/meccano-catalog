@@ -1,3 +1,5 @@
+// app\api\parts\route.ts
+
 import { NextResponse, NextRequest } from "next/server";
 import { dbConnect } from "@/lib/dbConnect";
 import PartModel from "@/lib/PartModel";
@@ -34,8 +36,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(parts);
   } catch (err) {
     console.error("[GET /api/parts]", err);
-    const errorMessage = err instanceof Error ? err.message : "An unknown error has occurred";
-    return NextResponse.json({ error: `Failed to fetch parts: ${errorMessage}` });
+    const errorMessage =
+      err instanceof Error ? err.message : "An unknown error has occurred";
+    return NextResponse.json({
+      error: `Failed to fetch parts: ${errorMessage}`,
+    });
   }
 }
 
@@ -48,7 +53,8 @@ export async function POST(request: NextRequest) {
     const part = await PartModel.create(body);
     return NextResponse.json(part, { status: 201 });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to create part";
+    const message =
+      err instanceof Error ? err.message : "Failed to create part";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

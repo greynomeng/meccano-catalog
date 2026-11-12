@@ -1,4 +1,4 @@
-// src/lib/imageUpload.ts
+// lib\imageUpload.ts
 
 import "server-only";
 
@@ -10,7 +10,7 @@ import {
   ALLOWED_IMAGE_TYPES,
   // MAX_IMAGE_SIZE,  // May re-instate this later
   PART_IMAGE_UPLOAD_DIR,
-  PART_IMAGE_URL_PREFIX
+  PART_IMAGE_URL_PREFIX,
 } from "@/lib/constants";
 
 export class ImageUploadError extends Error {
@@ -28,7 +28,11 @@ export function validateImage(file: File): void {
     throw new ImageUploadError("No image ws provided.");
   }
 
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number])) {
+  if (
+    !ALLOWED_IMAGE_TYPES.includes(
+      file.type as (typeof ALLOWED_IMAGE_TYPES)[number],
+    )
+  ) {
     throw new ImageUploadError("Only JPEG, PNG, and WebP images are allowed.");
   }
 
@@ -60,7 +64,10 @@ function getExtension(mimeType: string): string {
 /**
  * Generate a unique file name for a part image.
  */
-export function generateImageFilename(partId: string, mimeType: string): string {
+export function generateImageFilename(
+  partId: string,
+  mimeType: string,
+): string {
   const safePartId = partId
     .trim()
     .replace(/[^a-zA-Z0-9_-]/g, "-")
@@ -76,7 +83,10 @@ export function generateImageFilename(partId: string, mimeType: string): string 
  *
  * Returns the public URL.
  */
-export async function savePartImage(file: File, partId: string): Promise<string> {
+export async function savePartImage(
+  file: File,
+  partId: string,
+): Promise<string> {
   validateImage(file);
 
   if (!partId.trim()) {
